@@ -1,0 +1,29 @@
+    <h1 mat-dialog-title> Add Promotion </h1>
+    <mat-dialog-content style="padding-top: 5%">
+        <div>
+            <mat-form-field appearance="fill">
+                <mat-label>{{label}}</mat-label>
+                <input matInput
+                       (click)="_openDatepickerOnClick($any(datepicker))"
+                       (keydown.arrowdown)="_openDatepickerOnClick($any(datepicker))"
+                       (keydown.enter)="_openDatepickerOnClick($any(datepicker))"
+                       [formControl]="_inputCtrl"
+                       [matDatepicker]="$any(datepicker)"
+                       [max]="_max"
+                       [min]="_min"
+                       readonly>
+            </mat-form-field>
+            <mat-datepicker #datepicker
+                            (closed)="_takeFocusAway($any(datepicker))"
+                            (yearSelected)="_yearSelectedHandler($event,$any(datepicker))"
+                            [touchUi]="touchUi"
+                            startView="multi-year">
+            </mat-datepicker>
+        </div>
+
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button type="submit" color="primary" (click)="submit()">Confirmer</button>
+        <button mat-button type="button" mat-dialog-close (click)="onCancelUserDialog()">Annuler</button>
+    </mat-dialog-actions>
+

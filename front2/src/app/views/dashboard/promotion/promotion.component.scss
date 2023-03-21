@@ -1,0 +1,19 @@
+.background-image {
+  background-image: url('https://th.bing.com/th/id/R.5c77a0965810ae9fba1543a4fee67d4f?rik=94KeMof8veWt5Q&pid=ImgRaw&r=0');
+  background-size: cover;
+  background-position: center center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+.btn-new-promotion {
+  background-color: #007bff;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 30px;
+  padding: 12px 24px;
+  margin-top: 20px;
+}

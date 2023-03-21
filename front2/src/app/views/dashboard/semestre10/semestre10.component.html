@@ -1,0 +1,59 @@
+<mat-form-field floatPlaceholder="never" style="padding-top: 2%">
+  <input [hidden]="true" (change)="onFileSelect($event)" type="file" accept=".csv" #fileSelect>
+  <input readonly matInput [(ngModel)]="filename" placeholder="Select file to upload, only CSV PLEASE (The uploaded file will updated existing field with file content if same Student Number)..."/>
+  <button *ngIf="this.base64File" (click)="this.base64File = null; this.filename = null" matSuffix matTooltip="Remove selected file"
+          [matTooltipPosition]="'above'" type="button" color="warn" mat-icon-button>
+    <mat-icon>close</mat-icon>
+  </button>
+  <button matSuffix mat-icon-button (click)="fileSelect.click();"  matTooltip="Select a file" [matTooltipPosition]="'above'">
+    <mat-icon>file_upload</mat-icon>
+  </button>
+</mat-form-field>
+
+<div style="padding-bottom: 2%">
+  <div class="" *ngIf="displayUploadButton">
+    <button mat-fab extended color="primary" >
+      Cliquez ici pour charger {{filename}}
+    </button>
+  </div>
+</div>
+
+
+
+
+
+<section class="example-container mat-elevation-z8" tabindex="0">
+  <table mat-table [dataSource]="dataSource">
+    <ng-container [matColumnDef]="col.key" *ngFor="let col of columnsSchema">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ col.label }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <div [ngSwitch]="col.type" *ngIf="!element.isEdit">
+          <div class="btn-edit" *ngSwitchCase="'isEdit'">
+            <button mat-button (click)="element.isEdit = !element.isEdit">Editer</button>
+          </div>
+          <span *ngSwitchDefault>
+          {{ element[col.key] }}
+        </span>
+        </div>
+        <div *ngIf="element.isEdit">
+          <div class="btn-edit" *ngIf="col.key === 'isEdit'; else dataField">
+            <button mat-button (click)="element.isEdit = !element.isEdit">Enregistrer</button>
+          </div>
+          <ng-template #dataField>
+            <mat-form-field>
+              <input
+                [type]="col.type"
+                matInput
+                [(ngModel)]="element[col.key]"
+              />
+            </mat-form-field>
+          </ng-template>
+        </div>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</section>

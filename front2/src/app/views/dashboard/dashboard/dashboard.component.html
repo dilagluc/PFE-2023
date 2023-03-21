@@ -1,0 +1,353 @@
+<router-outlet></router-outlet>
+<h1 style="font-family: Comic Sans MS, Comic Sans, monospace;">Promotion : <span style="color: green">{{promotion}}</span></h1>
+
+<mat-form-field floatPlaceholder="never">
+    <input [hidden]="true" (change)="onFileSelect($event)" type="file" accept=".csv" #fileSelect>
+    <input readonly matInput [(ngModel)]="filename" placeholder="Select file to upload, only CSV PLEASE (The uploaded file will updated existing field with file content if same Student Number)..."/>
+    <button *ngIf="this.base64File" (click)="this.base64File = null; this.filename = null" matSuffix matTooltip="Remove selected file"
+            [matTooltipPosition]="'above'" type="button" color="warn" mat-icon-button>
+        <mat-icon>close</mat-icon>
+    </button>
+    <button matSuffix mat-icon-button (click)="fileSelect.click();"  matTooltip="Select a file" [matTooltipPosition]="'above'">
+        <mat-icon>file_upload</mat-icon>
+    </button>
+</mat-form-field>
+
+<div style="padding-bottom: 2%">
+    <div class="" *ngIf="displayUploadButton">
+        <button mat-fab extended color="primary" (click)="uploadStudentInfoAndUpdateDataSource()">
+            Cliquez ici pour charger {{filename}}
+        </button>
+    </div>
+</div>
+
+<input style="display: none" type="file" (change)="onFileSelect($event)" #hiddenfileinput>
+
+<article class="table-header">
+    <div>
+    </div>
+    <div>
+        <button style="margin-right: 10px"  mat-flat-button extended color="warn" (click)="removeSelectedRows()">
+            <mat-icon>delete</mat-icon>
+            Supprimer Etudiant
+        </button>
+        <!--<button
+                class="button-remove-rows"
+                mat-button
+                (click)="removeSelectedRows()"
+        >
+            Remove Rows
+        </button> -->
+        <button mat-flat-button extended  color="primary" (click)="addRow()">
+            <mat-icon>person</mat-icon>
+            Ajouter Etudiant
+        </button>
+        <!--<button class="button-add-row" mat-button (click)="addRow()">
+            Add Row
+        </button>-->
+    </div>
+</article>
+
+<c-row>
+  <c-col xs>
+    <c-card class="">
+      <c-card-header>Etudiants</c-card-header>
+      <c-card-body>
+
+          <mat-form-field>
+              <mat-label >Filter</mat-label>
+              <input matInput (keyup)="applyFilter($event)" placeholder="Filtrer" #input>
+          </mat-form-field>
+        <section >
+
+            <table mat-table [ngStyle]="{'background-color': backgroundOnEdit }"
+                 [dataSource]="dataSource" multiTemplateDataRows
+                  matSort  matSortActive="carbs" matSortDirection="asc">
+              <ng-container matColumnDef="{{column.key}}" *ngFor="let column of columnsSchema" >
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header [ngSwitch]="column.key">
+                      <span *ngSwitchCase="'isSelected'">
+                        <mat-checkbox
+                                (change)="selectAll($event)"
+                                [checked]="isAllSelected()"
+                                [indeterminate]="!isAllSelected() && isAnySelected()"
+                        ></mat-checkbox>
+                      </span>
+                      <span *ngSwitchDefault>{{ column.label }}</span>
+                  </th>
+
+                  <ng-template [ngIf]="column.key == 'b64ImageSrc'" [ngIfElse]="doelse">
+                      <td mat-cell *matCellDef="let element">
+                              <img src="{{element[column.key]}}" *ngIf="!element.isEdit">
+                          <button mat-fab extended *ngIf="element.isEdit" color="primary" (click)="hiddenfileinput.click()">
+                              Choose Image
+                          </button>
+                      </td>
+                  </ng-template>
+                  <ng-template #doelse>
+                  <td mat-cell *matCellDef="let element">
+                      <div [ngSwitch]="column.type" *ngIf="!element.isEdit">
+                          <ng-container *ngSwitchCase="'isSelected'">
+                              <mat-checkbox
+                                      (change)="element.isSelected = $event.checked"
+                                      [checked]="element.isSelected"
+                              ></mat-checkbox>
+                          </ng-container>
+
+                          <ng-container *ngSwitchCase="'image'">
+                              <img src="{{element[column.key]}}">
+                          </ng-container>
+                          <span *ngSwitchCase="'date'">
+                              {{ element[column.key] | date: 'mediumDate' }}
+                            </span>
+                          <span *ngSwitchDefault>
+                              {{ element[column.key] }}
+                            </span>
+                      </div>
+                      <div [ngSwitch]="column.type" *ngIf="element.isEdit">
+                          <div *ngSwitchCase="'isSelected'"></div>
+
+                          <mat-form-field
+                                  class="form-input"
+                                  *ngSwitchCase="'date'"
+                                  appearance="fill"
+                          >
+                              <mat-label>Choose a date</mat-label>
+                              <input
+                                      matInput
+                                      [matDatepicker]="picker"
+                                      [(ngModel)]="element[column.key]"
+                              />
+                              <mat-datepicker-toggle
+                                      matSuffix
+                                      [for]="picker"
+                              ></mat-datepicker-toggle>
+                              <mat-datepicker #picker></mat-datepicker>
+                          </mat-form-field>
+                          <mat-form-field class="form-input" *ngSwitchCase="'number'">
+                              <input
+                                      matInput
+                                      [type]="element.type"
+                                      [(ngModel)]="element[column.key]"
+                                      [disabled]="inputDisabled"
+                              />
+                          </mat-form-field>
+                          <mat-form-field class="form-input" *ngSwitchDefault>
+                              <input
+                                      matInput
+                                      [type]="element.type"
+                                      [(ngModel)]="element[column.key]"
+                              />
+                          </mat-form-field>
+                      </div>
+                  </td>
+                  </ng-template>
+
+                  <!--<ng-template [ngIf]="column.key == 'b64ImageSrc'" [ngIfElse]="doelse">
+                      <td mat-cell *matCellDef="let element">  <img src="{{element[column.key]}}">      </td>
+                  </ng-template>
+
+                  <ng-template #doelse>
+                      <td mat-cell *matCellDef="let element"> {{element[column.key]}} </td>
+                  </ng-template>  -->
+
+              </ng-container>
+              <ng-container matColumnDef="expand">
+                  <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+                  <td mat-cell *matCellDef="let element">
+                      <button mat-icon-button aria-label="expand row" (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
+                          <mat-icon *ngIf="expandedElement !== element">keyboard_arrow_down</mat-icon>
+                          <mat-icon *ngIf="expandedElement === element">keyboard_arrow_up</mat-icon>
+                      </button>
+                  </td>
+              </ng-container>
+
+              <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+              <ng-container matColumnDef="expandedDetail">
+
+                  <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplayWithExpand.length">
+                      <div class="example-element-detail"
+                           [@detailExpand]="(element == expandedElement || element.isEdit==true ) ? 'expanded' : 'collapsed'" >
+                          <div class="example-element-diagram">
+                          </div>
+
+                          <ng-template [ngIf]="!element.isEdit" >
+                          <div class="example-element-description"   >
+                              <div>
+                                  <span style="font-size: medium; text-decoration: underline">Date de naissance</span>:
+                                  <span style="font-size:medium; font-family: Comic Sans MS, Comic Sans monospace"> {{ element.birthDate | date: 'dd/MM/yyyy' }} </span>
+                              </div>
+
+                              <div style="display: flex; align-items: center;padding-top: 5%">
+                                  <div>
+                                      <span style="font-size: medium; text-decoration: underline">Emails</span>:
+                                      <a style="padding-top: 5%; font-family: 'Comic Sans MS, Comic Sans monospace';text-decoration: none">{{element.email}}</a></div>
+                                  <mat-icon style="color: blue; font-size: 40px; width: 44px; height: 40px; margin-left: 1rem;">email</mat-icon>
+                              </div>
+                             <!-- <div style="display: flex; align-items: center;">
+                                  <div>
+                                      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                      <a style="font-family: 'Comic Sans MS, Comic Sans monospace';text-decoration: none">{{element.email}}</a></div>
+                                  <mat-icon style="color: blue; font-size: 40px; width: 44px; height: 40px; margin-left: 1rem;">email</mat-icon>
+
+                              </div>
+                              -->
+
+                              <div style="padding-top: 5%">
+                                  <span style="font-size: medium; text-decoration: underline">Téléphone</span>:
+                                      <a style="padding-top: 5%; font-family: 'Comic Sans MS, Comic Sans monospace'; text-decoration: none">{{element.tel}}</a>
+                              </div>
+                              <div style="padding-top: 5%">
+                                  <span style="font-size: medium; text-decoration: underline">Addresse Postale</span>:
+                                  <a style="padding-top: 5%; font-family: 'Comic Sans MS, Comic Sans monospace'; text-decoration: none">{{element.addrPostal}}</a>
+                              </div>
+
+                          </div>
+                              <div class="example-element-description">
+                                  <div>&nbsp;</div>
+                                  <div class="">
+                                      <h1>&nbsp;
+                                          <button mat-stroked-button color="warn" (click)="element.isEdit = !element.isEdit; edit()" color="primary">Editer</button>
+                                      </h1>
+
+                                  </div>
+                              </div>
+
+                              <div class="example-element-description"></div>
+                              <div class="example-element-description"></div>
+
+                              <div class="example-element-description">
+                                  <div>&nbsp;</div>
+                                  <div class="">
+                                      <h1>&nbsp;
+                                          <button mat-stroked-button color="warn" (click)="delete(element)" color="warn" >Supprimer</button>
+                                      </h1>
+
+                                  </div>
+
+                              </div>
+                              <div class="example-element-description">
+                                  <div>&nbsp;</div>
+                                  <div class="">
+                                      <h1>&nbsp;
+                                          <button mat-stroked-button color="warn" [routerLink]="['/dashboard/scolarform', element.numEtudiant]" color="primary" >Voir plus </button>
+                                      </h1>
+
+
+                                  </div>
+
+                              </div>
+                          </ng-template>
+
+                          <ng-template  [ngIf]="element.isEdit" >
+                          <div class="example-element-description" >
+                              <div>
+                                  <mat-form-field
+                                          class="form-input"
+                                          appearance="fill"
+                                  >
+                                      <mat-label>Date de naissance</mat-label>
+                                      <input
+                                              matInput
+                                              [matDatepicker]="dp"
+                                              [(ngModel)]="element.birthDate"
+                                              [readonly]="true"
+                                      />
+                                      <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+                                      <mat-datepicker touchUi #dp></mat-datepicker>
+
+                                  </mat-form-field>
+
+                              </div>
+
+                              <div style="display: flex; align-items: center;">
+                                  <div>
+
+                                      <mat-form-field >
+                                          <mat-label>Email</mat-label>
+                                          <input
+                                                  matInput
+                                                  [type]="element.type"
+                                                  [(ngModel)]="element.email"
+                                          />
+                                      </mat-form-field>
+
+                                  </div>
+                              </div>
+
+                              <div style="padding-top: 5%">
+                                  <mat-form-field >
+                                      <mat-label>Téléphone</mat-label>
+                                      <input
+                                              matInput
+                                              [type]="element.type"
+                                              [(ngModel)]="element.tel"
+                                      />
+                                  </mat-form-field>
+                              </div>
+
+                          </div>
+
+                              <div class="example-element-description"></div>
+                              <div class="example-element-description"></div>
+                              <div class="example-element-description"></div>
+                              <div class="example-element-description"></div>
+                              <div class="example-element-description">
+                                  <div>&nbsp;</div>
+                                  <div class="">
+                                      <h1>&nbsp;
+                                          <button mat-stroked-button color="warn" (click)="element.isEdit = !element.isEdit; save(element)" color="primary">Enregistrer</button>
+                                      </h1>
+
+                                  </div>
+                              </div>
+                              <div class="example-element-description">
+                                  <div>&nbsp;</div>
+                                  <div class="">
+                                      <h1>&nbsp;
+                                          <button mat-stroked-button color="warn" (click)="delete(element)" color="warn" >Supprimer</button>
+                                      </h1>
+
+
+                                  </div>
+
+                              </div>
+                              <div class="example-element-description">
+                                  <div>&nbsp;</div>
+                                  <div class="">
+                                      <h1>&nbsp;
+                                          <button mat-stroked-button color="warn" [routerLink]="['/dashboard/scolarform', element.numEtudiant]" color="primary" >Voir plus </button>
+                                      </h1>
+
+
+                                  </div>
+
+                              </div>
+                          </ng-template>
+
+
+                      </div>
+
+                  </td>
+
+              </ng-container>
+
+
+              <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand; " ></tr>
+              <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithExpand;"
+                  class="example-element-row"
+                  [class.example-expanded-row]="expandedElement === element"
+                  (click)="expandedElement = expandedElement === element ? null : element">
+              </tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+              <!-- Row shown when there is no matching data. -->
+              <tr class="mat-row" *matNoDataRow>
+                  <td class="mat-cell" colspan="4">Aucun résultat pour "{{input.value}}"</td>
+              </tr>
+          </table>
+            <mat-paginator [pageSizeOptions]="[4, 8, 16, 25, 50, 100]" aria-label="Select page of users"></mat-paginator>
+        </section>
+
+      </c-card-body>
+    </c-card>
+  </c-col>
+</c-row>

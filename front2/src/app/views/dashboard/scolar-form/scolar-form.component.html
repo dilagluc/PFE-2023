@@ -1,0 +1,132 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>Student Info</mat-card-title>
+    </mat-card-header>
+    <mat-card-actions>
+        <div class="example-element-detail" *ngIf="studentInfos">
+            <div class="example-element-diagram">
+                   <img src="{{studentInfos.image}}">
+            </div>
+            <div>
+                <br>
+                <span style="font-size: medium; text-decoration: underline">Numéro Etudiant</span>:
+                <span style="font-size:medium; font-family: 'Lucida Console'"> {{studentInfos.studentNum}} </span>
+                <br>
+                <span style="font-size: medium; text-decoration: underline">Nom et Prénoms</span>:
+                <span style="font-size:medium; font-family: 'Lucida Console'"> {{studentInfos.lastName}} &nbsp; {{studentInfos.firstName}} </span>
+                <br>
+                <span style="font-size: medium; text-decoration: underline">Téléphone</span>:
+                <span style="font-size:medium; font-family: 'Lucida Console'"> {{studentInfos.tel1}} </span>
+                <br>
+                <span style="font-size: medium; text-decoration: underline">Email</span>:
+                <span style="font-size:medium; font-family: 'Lucida Console'"> {{studentInfos.email1}} </span>
+            </div>
+
+            <!---
+            <div style="padding-top: 5%">
+                <span style="font-size: medium; text-decoration: underline">Nom et Prénoms</span>:
+                <span style="font-size:medium; font-family: 'Lucida Console'"> BEN-YAALA Siwar </span>
+            </div>
+
+            <div style="padding-top: 5%">
+                <span style="font-size: medium; text-decoration: underline">Téléphone</span>:
+                <span style="font-size:medium; font-family: 'Lucida Console'"> +33 758889566662 </span>
+            </div>
+            -->
+        </div>
+    </mat-card-actions>
+</mat-card>
+
+<br>
+
+<c-row>
+    <c-col xs>
+        <c-card class="mb-4">
+            <c-card-body>
+                <mat-tab-group animationDuration="1000ms">
+                    <mat-tab >
+                        <ng-template mat-tab-label>
+                            <mat-icon class="example-tab-icon">school  </mat-icon>
+                            &nbsp;Fiche de scolarité
+                        </ng-template>
+                        <mat-tab-group animationDuration="1000ms">
+
+                            <mat-tab >
+                                <ng-template mat-tab-label>
+                                    Semestre 5
+                                </ng-template>
+                                <app-semestre5></app-semestre5>
+                            </mat-tab>
+
+                            <mat-tab>
+                                <ng-template mat-tab-label>
+                                    Semestre 6
+                                </ng-template>
+                                <app-semestre6></app-semestre6>
+                            </mat-tab>
+
+                            <mat-tab>
+                                <ng-template mat-tab-label>
+                                    Semestre 7
+                                </ng-template>
+                                <app-semestre7></app-semestre7>
+                            </mat-tab>
+
+                            <mat-tab>
+                                <ng-template mat-tab-label>
+                                    Semestre 8
+                                </ng-template>
+                                <app-semestre8></app-semestre8>
+                            </mat-tab>
+
+                            <mat-tab>
+                                <ng-template mat-tab-label>
+                                    Semestre 9
+                                </ng-template>
+                                <app-semestre9></app-semestre9>
+                            </mat-tab>
+
+                            <mat-tab>
+                                <ng-template mat-tab-label>
+                                    Semestre 10
+                                </ng-template>
+                                <app-semestre10></app-semestre10>
+                            </mat-tab>
+
+
+                        </mat-tab-group>
+                    </mat-tab>
+
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <mat-icon class="example-tab-icon"></mat-icon>
+                            Résultat TOEIC
+                        </ng-template>
+
+                        <!-- <app-suivi-toeic></app-suivi-toeic> -->
+
+                        <app-resultat-toeic></app-resultat-toeic>
+                    </mat-tab>
+
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <mat-icon class="example-tab-icon">group</mat-icon>
+                            &nbsp;Stages
+                        </ng-template>
+                        <app-stages></app-stages>
+                    </mat-tab>
+
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <mat-icon class="example-tab-icon">flight_takeoff</mat-icon>
+                            &nbsp;SMI
+                        </ng-template>
+                        <app-smi></app-smi>
+                    </mat-tab>
+
+
+                </mat-tab-group>
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>
